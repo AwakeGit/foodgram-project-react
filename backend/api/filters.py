@@ -1,51 +1,43 @@
-from django_filters.rest_framework import FilterSet
-from django_filters.rest_framework.filters import (
-    BooleanFilter,
-    CharFilter,
-    ModelMultipleChoiceFilter,
-)
+from django_filters import rest_framework as filters
+from rest_framework.filters import SearchFilter
 
-from recipes.models import Ingredient, Recipe, Tag
+from recipes.models import Recipe, Tag
 
 
-class IngredientFilter(FilterSet):
+class RecipeFilterSet(filters.FilterSet):
+    """Набор фильтров для рецептов."""
 
-    name = CharFilter(lookup_expr='startswith')
-
-    class Meta:
-        model = Ingredient
-        fields = ('name',)
-
-
-class RecipeFilter(FilterSet):
-    is_favorited = BooleanFilter(method='filter_is_favorited')
-    is_in_shopping_cart = BooleanFilter(
-        method='filter_is_in_shopping_list'
+    is_favorited = filters.BooleanFilter(method='filter_by_favorite')
+    is_in_shopping_cart = filters.BooleanFilter(
+        method='filter_by_shopping_cart')
+    author = filters.CharFilter(field_name='author__id')
+    tags = filters.ModelMultipleChoiceFilter(
+        field_name='tags__slug',
+        to_field_name='slug',
+        queryset=Tag.objects.all()
     )
-    tags = ModelMultipleChoiceFilter(field_name='tags__slug',
-                                     to_field_name='slug',
-                                     queryset=Tag.objects.all(),)
+    name = filters.CharFilter(field_name='name', lookup_expr='startswith')
 
     class Meta:
         model = Recipe
-        fields = ('author', 'tags')
+        fields = ['author', 'tags', 'name']
 
-    def filter_is_favorited(self, queryset, name, value):
+    def filter_by_favorite(self, queryset, name, value):
+        """Фильтрация по избранным рецептам."""
         user = self.request.user
-        if value and user.is_authenticated:
-            favorite_instancies = user.favorites.all()
-            favorite_recipes_id = []
-            for favorite_instance in favorite_instancies:
-                favorite_recipes_id.append(favorite_instance.recipe.id)
-            return queryset.filter(id__in=favorite_recipes_id)
-        return queryset
+        return queryset.filter(
+            favorites__user=user) if (
+                value and user.is_authenticated) else queryset
 
-    def filter_is_in_shopping_list(self, queryset, name, value):
+    def filter_by_shopping_cart(self, queryset, name, value):
+        """Фильтрация по наличию в списке покупок."""
         user = self.request.user
-        if value and user.is_authenticated:
-            shoppinglist_instancies = user.shopping_lists.all()
-            shoppinglist_recipes_id = []
-            for shoppinglist_instance in shoppinglist_instancies:
-                shoppinglist_recipes_id.append(shoppinglist_instance.recipe.id)
-            return queryset.filter(id__in=shoppinglist_recipes_id)
-        return queryset
+        return queryset.filter(
+            shoppinglist__user=user) if (
+                value and user.is_authenticated) else queryset
+
+
+class RecipeSearchFilter(SearchFilter):
+    """Фильтр поиска для рецептов."""
+
+    search_param = 'name'

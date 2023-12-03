@@ -9,7 +9,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-
+from .permissions import IsAuthorOrReadOnly
 from recipes.models import (
     Favorite,
     Ingredient,
@@ -18,10 +18,9 @@ from recipes.models import (
     ShoppingList,
     Tag,
 )
-from recipes.permissions import AuthorOrReadOnly, ReadOnly
 from users.models import Subscription
 
-from .filters import IngredientFilter, RecipeFilter
+from .filters import RecipeFilterSet
 from .serializers import (
     IngredientSerializer,
     MinimalRecipeSerializer,
@@ -97,13 +96,13 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     pagination_class = None
     filter_backends = (DjangoFilterBackend,)
-    filterset_class = IngredientFilter
+    filterset_class = RecipeFilterSet
 
 
 class TagViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = (ReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('slug',)
     pagination_class = None
@@ -111,15 +110,15 @@ class TagViewSet(ReadOnlyModelViewSet):
 
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
-    permission_classes = (AuthorOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('author', 'name', 'tags')
-    filterset_class = RecipeFilter
+    filterset_class = RecipeFilterSet
     ordering = ('-pub_date',)
 
     def get_permissions(self):
         if self.action == 'retrieve':
-            return (ReadOnly(),)
+            return (IsAuthorOrReadOnly(),)
         return super().get_permissions()
 
     def get_serializer_class(self):

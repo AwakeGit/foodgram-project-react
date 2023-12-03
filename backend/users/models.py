@@ -1,31 +1,27 @@
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
-# from rest_framework.authtoken.models import Token
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
 
 class Subscription(models.Model):
+    """
+    Модель подписки.
+    Содержит информацию о том, кто на кого подписан.
+    """
+
     subscriber = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='subscriptions',
-        verbose_name='подписчик',
-        help_text=(
-            'Выберете пользователя, который подписывается '
-            'на того или иного автора рецептов'
-        ),
+        related_name='подписчики',
+        verbose_name='Подписчик',
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='subscribers',
-        verbose_name='автор рецепта',
-        help_text=(
-            'Выберете автора рецептов, на которого подписывается тот или иной '
-            '(выбранный ранее) пользователь'
-        ),
+        related_name='авторы',
+        verbose_name='Автор',
     )
 
     class Meta:
@@ -33,19 +29,15 @@ class Subscription(models.Model):
         verbose_name_plural = 'Подписки'
         constraints = [
             models.UniqueConstraint(fields=['subscriber', 'author'],
-                                    name='subscriber-author constraint')
+                                    name='подписчик-автор')
         ]
 
     def __str__(self):
         return f'{self.subscriber} подписан(а) на {self.author}'
 
     def clean(self):
+        """
+        Проверяет, что пользователь не может подписаться на самого себя.
+        """
         if self.subscriber == self.author:
             raise ValidationError('Нельзя подписаться на самого себя')
-
-
-# class CustomToken(Token):
-
-#     class Meta:
-#         verbose_name = 'Токен'
-#         verbose_name_plural = 'Токены'
