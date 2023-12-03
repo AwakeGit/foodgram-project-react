@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
 class CustomUser(AbstractUser):
@@ -58,3 +59,39 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='subscriptions_as_user',
+        verbose_name='Подписчик',
+        help_text='Подписчик'
+    )
+    subscriber = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='subscriptions_as_subscriber',
+        verbose_name='Подписка',
+        help_text='Подписка'
+    )
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'subscriber'],
+                name='unique_user_subscriber')
+        ]
+
+    def clean(self):
+        if self.user == self.subscriber:
+            raise ValidationError(
+                'Пользователь не может подписаться на самого себя.')
+
+    def __str__(self):
+        return (f'User {self.user.username} - '
+                f'Subscriber {self.subscriber.username}')
