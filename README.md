@@ -17,3 +17,4 @@ docker compose -f docker-compose.yml exec backend python manage.py
 import_ingredients
 docker-compose exec backend python manage.py data_test
 docker compose -f docker-compose.yml exec backend python manage.py data_test
+docker compose exec backend python manage.py createsuperuser

@@ -76,7 +76,6 @@ class UserDetailSerializer(UserSerializer):
 
 
 class SpecialUserCreateSerializer(UserCreateSerializer):
-
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name', 'last_name',
@@ -99,14 +98,12 @@ class SpecialUserCreateSerializer(UserCreateSerializer):
 
 
 class TagSerializer(ModelSerializer):
-
     class Meta:
         model = Tag
         fields = ('id', 'name', 'color', 'slug')
 
 
 class IngredientSerializer(ModelSerializer):
-
     class Meta:
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit')
