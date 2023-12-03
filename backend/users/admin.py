@@ -1,14 +1,28 @@
 from django.contrib import admin
-from .models import CustomUser
+from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin
+from rest_framework.authtoken.models import Token, TokenProxy
+from rest_framework.authtoken.admin import TokenAdmin
+
+from .models import Subscription
+
+User = get_user_model()
+
+admin.site.register(Subscription)
 
 
-class CustomUserAdmin(admin.ModelAdmin):
-    list_display = (
-        'id', 'username', 'email', 'first_name', 'last_name', 'password'
-    )
-    list_filter = ('first_name', 'email')
-    search_fields = ('username', 'email')
-    empty_value_display = '-пусто-'
+class CustomUserAdmin(UserAdmin):
+    list_filter = ('username', 'email')
 
 
-admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.unregister(User)
+admin.site.register(User, CustomUserAdmin)
+
+admin.site.unregister(TokenProxy)
+
+
+class MyTokenAdmin(TokenAdmin):
+    pass
+
+
+admin.site.register(Token, MyTokenAdmin)
