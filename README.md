@@ -59,6 +59,7 @@ DB_PORT=5432
 4. Запустить проект в докере:
 
 ```bash
+docker system prune -af
 docker compose up -d
 docker-compose exec backend python manage.py migrate
 docker-compose exec backend python manage.py collectstatic --noinput
