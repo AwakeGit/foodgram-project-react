@@ -1,5 +1,3 @@
-Как можно улучшить READMD:
-
 # FoodGram
 
 ## Описание
@@ -39,7 +37,7 @@ git clone git@github.com:AwakeGit/foodgram-project-react.git
 2. Перейти в каталог проекта:
 
 ```bash
-cd foodgram-project-react/infra
+cd foodgram-project-react
 ```
 
 3. Создать .env файл:
@@ -60,10 +58,12 @@ DB_PORT=5432
 
 ```bash
 docker system prune -af
-docker compose up -d
-docker-compose exec backend python manage.py migrate
-docker-compose exec backend python manage.py collectstatic --noinput
-docker-compose exec backend python manage.py import_tags
-docker-compose exec backend python manage.py import_ingredients
-docker-compose exec backend python manage.py data_test
+docker-compose -f docker-compose.yml pull
+docker-compose -f docker-compose.yml down
+docker-compose -f docker-compose.yml up -d --build
+docker-compose -f docker-compose.yml exec backend python manage.py makemigrations   
+docker-compose -f docker-compose.yml exec backend python manage.py migrate
+docker-compose -f docker-compose.yml exec backend python manage.py collectstatic --noinput
+docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/
+КОМАНДЫ для загрзки данных
 ```
