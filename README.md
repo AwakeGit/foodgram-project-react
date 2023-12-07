@@ -66,7 +66,5 @@ docker-compose -f docker-compose.yml exec backend python manage.py migrate
 docker-compose -f docker-compose.yml exec backend python manage.py collectstatic --noinput
 docker-compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/
 
-docker-compose -f docker-compose.production.yml exec backend python manage.py import_ingredients_from_csv
-или
-docker-compose -f docker-compose.production.yml exec backend python manage.py import_ingredients_from_json
+docker-compose -f docker-compose.production.yml exec backend python manage.py load_data
 ```
