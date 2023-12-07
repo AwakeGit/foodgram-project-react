@@ -21,5 +21,9 @@ docker-compose -f docker-compose.yml exec backend python manage.py collectstatic
 
 # Копировать собранные статические файлы в указанную директорию
 docker-compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/
-export DJANGO_SUPERUSER_PASSWORD=test
-docker-compose -f docker-compose.yml exec backend python manage.py createsuperuser --username=admin --email=test@test.ru --noinput
+
+#export DJANGO_SUPERUSER_PASSWORD=test
+#docker-compose -f docker-compose.yml exec backend python manage.py createsuperuser --username=admin --email=test@test.ru --noinput
+
+# Импортировать ингредиенты
+docker-compose -f docker-compose.production.yml exec backend python manage.py import_ingredients_from_csv
