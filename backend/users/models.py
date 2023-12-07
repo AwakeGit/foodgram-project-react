@@ -1,43 +1,64 @@
-from django.core.exceptions import ValidationError
+from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.contrib.auth import get_user_model
 
-User = get_user_model()
+
+class User(AbstractUser):
+    """Кастомная модель пользователя."""
+    email = models.EmailField(
+        verbose_name='Email адрес',
+        unique=True,
+        max_length=254,
+        blank=False,
+        null=False
+    )
+    first_name = models.CharField(
+        verbose_name='Имя',
+        max_length=150,
+        blank=False,
+        null=False
+    )
+    last_name = models.CharField(
+        verbose_name='Фамилия',
+        max_length=150,
+        blank=False,
+        null=False
+    )
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+        ordering = ['username']
+
+    def __str__(self):
+        """Возвращает строковое представление пользователя."""
+        return self.first_name
 
 
 class Subscription(models.Model):
-    """
-    Модель подписки.
-    Содержит информацию о том, кто на кого подписан.
-    """
-
-    subscriber = models.ForeignKey(
+    """Класс подписки."""
+    user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='подписчики',
-        verbose_name='Подписчик',
+        related_name='subscriber',
+        verbose_name='Подписчик'
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='авторы',
-        verbose_name='Автор',
+        related_name='subscribing',
+        verbose_name='Автор'
     )
 
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
-        constraints = [
-            models.UniqueConstraint(fields=['subscriber', 'author'],
-                                    name='подписчик-автор')
-        ]
+        constraints = [models.UniqueConstraint(
+            fields=['user', 'author'], name='unique_subscriber'
+        )]
 
     def __str__(self):
-        return f'{self.subscriber} подписан(а) на {self.author}'
-
-    def clean(self):
-        """
-        Проверяет, что пользователь не может подписаться на самого себя.
-        """
-        if self.subscriber == self.author:
-            raise ValidationError('Нельзя подписаться на самого себя')
+        """Возвращает строковое представление подписки."""
+        return f'{self.user} подписан на {self.author}'

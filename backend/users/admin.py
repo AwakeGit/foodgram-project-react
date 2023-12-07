@@ -1,43 +1,24 @@
 from django.contrib import admin
-from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from rest_framework.authtoken.models import Token
-
-from .models import Subscription
+from .models import Subscription, User
 
 
-class SubscriptionAdmin(admin.ModelAdmin):
-    """
-    Административный интерфейс для модели Subscription.
-    Отображает подписчиков и авторов подписок.
-    """
-    list_filter = ('subscriber', 'author')
-
-    def __str__(self, obj):
-        """
-        Возвращает строковое представление подписки.
-        """
-        return f'{obj.subscriber} подписан(а) на {obj.author}'
-
-
+@admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    """
-    Пользовательский административный интерфейс для модели User.
-    Отображает имена пользователей и их электронные адреса.
-    """
-    list_filter = ('username', 'email')
+    list_display = (
+        'username', 'email', 'first_name', 'last_name', 'is_staff',)
+    list_filter = ('is_staff', 'is_superuser', 'groups')
+    search_fields = ('username', 'email', 'first_name', 'last_name')
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
+        ('Permissions', {'fields': (
+            'is_active', 'is_staff', 'is_superuser', 'groups',
+            'user_permissions')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+    )
 
 
-class MyTokenAdmin(admin.ModelAdmin):
-    """
-    Административный интерфейс для модели Token.
-    """
-    pass
-
-
-# Регистрация моделей с пользовательскими классами администратора
-User = get_user_model()
-admin.site.unregister(User)
-admin.site.register(User, CustomUserAdmin)
-admin.site.register(Subscription, SubscriptionAdmin)
-admin.site.register(Token, MyTokenAdmin)
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ('user', 'author')
