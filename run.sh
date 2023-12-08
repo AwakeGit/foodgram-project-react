@@ -13,7 +13,7 @@ docker-compose -f docker-compose.yml down
 docker-compose -f docker-compose.yml up -d --build
 
 # Выполнить миграции базы данных
-docker-compose -f docker-compose.yml exec backend python manage.py makemigrations users
+docker-compose -f docker-compose.yml exec backend python manage.py makemigrations
 docker-compose -f docker-compose.yml exec backend python manage.py migrate
 
 # Собрать статические файлы
