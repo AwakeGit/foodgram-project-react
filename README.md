@@ -7,7 +7,7 @@ admin
 admin@gmail.com
 qwesadzxc123
 
-user@mgmail.com
+user@gmail.com
 user
 qwesadzxc123
 
@@ -78,7 +78,31 @@ docker-compose -f docker-compose.yml up -d --build
 docker-compose -f docker-compose.yml exec backend python manage.py makemigrations   
 docker-compose -f docker-compose.yml exec backend python manage.py migrate
 docker-compose -f docker-compose.yml exec backend python manage.py collectstatic --noinput
-docker-compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/
+docker-compose -f docker-compose.yml exec backend cp -r /app/collected_static/. /backend_static/static/
+docker-compose -f docker-compose.yml exec backend python manage.py load_data
+```
 
-docker-compose -f docker-compose.production.yml exec backend python manage.py load_data
+## Использование в реальной среде
+
+1. Подключиться к серверу:
+```bash
+ssh -i [name] [user]@[ip]
+```
+2. Создать и перейти в каталог проекта:
+```bash
+mkdir foodgram
+cd foodgram
+```
+3. Создать .env файл и docker-compose.production.yml:
+4. Запустить проект в докере:
+```bash
+sudo docker system prune -af
+sudo docker compose -f docker-compose.production.yml pull
+sudo docker compose -f docker-compose.production.yml down
+sudo docker compose -f docker-compose.production.yml up -d --build
+sudo docker compose -f docker-compose.production.yml exec backend python manage.py makemigrations
+sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
+sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/
+sudo docker compose -f docker-compose.production.yml exec backend python manage.py load_data
 ```
