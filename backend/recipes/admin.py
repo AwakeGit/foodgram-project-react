@@ -1,39 +1,38 @@
 from django.contrib import admin
-from recipes.forms import NotAllowEmptyForm
-from recipes.models import (
-    Favorite, Ingredient,
-    IngredientRecipes, Recipe,
-    ShoppingCart, Tag
+from .forms import NotAllowEmptyForm
+from .models import (
+    Favorite, Ingredient, IngredientRecipes,
+    Recipe, ShoppingCart, Tag
 )
 
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
-    """Листинг избранных рецептов."""
+    """Любимые рецепты."""
     list_display = ('user', 'recipe')
 
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    """Ингредиенты."""
+    """Админка для ингредиентов."""
     list_display = ('id', 'name', 'measurement_unit')
     list_filter = ('name',)
 
 
 class InlineBase(admin.TabularInline):
-    """Инлайн для рецептов."""
+    """Интерфейс для создания связей между рецептами и ингредиентами."""
     extra = 0
     min_num = 1
     formset = NotAllowEmptyForm
 
 
 class IngredientRecipeInline(InlineBase):
-    """Ингредиенты рецепта."""
+    """Интерфейс для создания связей между рецептами и ингредиентами."""
     model = IngredientRecipes
 
 
 class TagInline(InlineBase):
-    """Теги рецепта."""
+    """Теги рецептов."""
     model = Recipe.tags.through
 
 

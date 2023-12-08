@@ -6,12 +6,12 @@ class NotAllowEmptyForm(BaseInlineFormSet):
     """Форма для удаления ингредиентов или тегов из рецепта."""
 
     def clean(self):
+        """Проверка на наличие ингредиентов или тегов."""
         super().clean()
 
         counter_true = sum(
-            1 for form in self.forms if
-            form.cleaned_data.get('DELETE') is True)
+            1 for form in self.forms if form.cleaned_data.get('DELETE'))
 
-        if len(self.forms) == counter_true:
+        if counter_true == len(self.forms):
             raise ValidationError(
                 'Нельзя удалить все ингредиенты или теги из рецепта')
