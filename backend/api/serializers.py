@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.db import transaction
 from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
@@ -127,11 +126,15 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         """Получает queryset с рецептами из избранного."""
-        return obj.favorites.filter(user=self.context['request'].user).exists()
+        user = self.context.get('request').user
+        return (user.is_authenticated
+                and user.favorites.filter(recipe=obj).exists())
 
     def get_is_in_shopping_cart(self, obj):
         """Получает queryset с рецептами в корзине."""
-        return obj.cart.filter(user=self.context['request'].user).exists()
+        user = self.context.get('request').user
+        return (user.is_authenticated
+                and user.cart.filter(recipe=obj).exists())
 
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
@@ -170,16 +173,11 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         IngredientRecipes.objects.bulk_create(ingredient_objs)
 
     def create(self, validated_data):
-        """Создает рецепт."""
-        tags_data = validated_data.pop('tags')
-        ingredients_data = validated_data.pop('ingredients')
-        with transaction.atomic():
-            recipe = Recipe.objects.create(**validated_data)
-            recipe.tags.set(tags_data)
-            self.create_ingredients(
-                recipe=recipe,
-                ingredients=ingredients_data
-            )
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
+        recipe = Recipe.objects.create(**validated_data)
+        recipe.tags.set(tags)
+        self.create_ingredients(recipe=recipe, ingredients=ingredients)
         return recipe
 
     def update(self, instance, validated_data):
