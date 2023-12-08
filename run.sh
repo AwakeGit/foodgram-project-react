@@ -26,4 +26,4 @@ docker-compose -f docker-compose.production.yml exec backend cp -r /app/collecte
 #docker-compose -f docker-compose.yml exec backend python manage.py createsuperuser --username=admin --email=test@test.ru --noinput
 
 # Импортировать ингредиенты
-docker-compose -f docker-compose.production.yml exec backend python manage.py import_ingredients_from_csv
+docker-compose -f docker-compose.production.yml exec backend python manage.py load_data
