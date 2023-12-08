@@ -184,7 +184,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """Обновляет рецепт."""
-        tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         instance.tags.clear()
         super().update(instance, validated_data)

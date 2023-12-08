@@ -9,7 +9,7 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (
-    SAFE_METHODS, IsAuthenticated, IsAuthenticatedOrReadOnly
+    IsAuthenticated, IsAuthenticatedOrReadOnly
 )
 from rest_framework.response import Response
 
@@ -37,11 +37,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filterset_class = RecipeFilter
 
     def get_queryset(self):
-        """Получает queryset с рецептами."""
-        recipes = Recipe.objects.prefetch_related(
+        """Получает набор запросов с рецептами."""
+        return Recipe.objects.prefetch_related(
             'amount_ingredients__ingredient', 'tags'
         ).all()
-        return recipes
 
     def perform_create(self, serializer):
         """Функция создания рецепта."""
@@ -108,8 +107,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         response = HttpResponse('\n'.join(shopping_list),
                                 content_type='text/plain')
-        response['Content-Disposition'] = \
+        response['Content-Disposition'] = (
             'attachment; filename="shopping_list.txt"'
+        )
         return response
 
 
@@ -128,10 +128,12 @@ class IngredientViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Получает queryset с ингредиентами."""
-        queryset = Ingredient.objects.all()
         ingredients_name = self.request.query_params.get('name')
+        queryset = Ingredient.objects.all()
+
         if ingredients_name is not None:
             queryset = queryset.filter(name__istartswith=ingredients_name)
+
         return queryset
 
 
