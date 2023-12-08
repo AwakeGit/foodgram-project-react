@@ -1,17 +1,18 @@
 # FoodGram
 
-### admin
+### Данные для входа
 
+```bash 
 admin
-pashaaaa86@gmail.com
+admin@gmail.com
 qwesadzxc123
 
-### user
-
-test@test.com
-test
+user@mgmail.com
+user
 qwesadzxc123
+
 https://taski-awake.ddns.net/
+````
 
 ## Описание
 
