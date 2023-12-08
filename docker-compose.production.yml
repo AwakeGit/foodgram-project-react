@@ -34,5 +34,5 @@ services:
       - static:/staticfiles/
       - media:/media/
     ports:
-      - "8000:80"
+      - "8000:90"
     restart: always
