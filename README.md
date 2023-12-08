@@ -1,7 +1,18 @@
 # FoodGram
+
 ### admin
+
+admin
 pashaaaa86@gmail.com
 qwesadzxc123
+
+### user
+
+test@test.com
+test
+qwesadzxc123
+https://taski-awake.ddns.net/
+
 ## Описание
 
 Фудграм представляет собой веб-приложение, созданное для

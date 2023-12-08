@@ -129,12 +129,11 @@ class IngredientViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Получает queryset с ингредиентами."""
         ingredients_name = self.request.query_params.get('name')
-        queryset = Ingredient.objects.all()
-
         if ingredients_name is not None:
-            queryset = queryset.filter(name__istartswith=ingredients_name)
-
-        return queryset
+            return Ingredient.objects.all().filter(
+                name__istartswith=ingredients_name
+            )
+        return Ingredient.objects.all()
 
 
 class CustomUserViewSet(UserViewSet):
