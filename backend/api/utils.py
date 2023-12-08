@@ -4,35 +4,31 @@ from users.models import Subscription
 
 
 def create_object(request, pk, serializer_in, serializer_out, model):
+    """Функция создания объекта."""
     user = request.user.id
     obj = get_object_or_404(model, id=pk)
 
-    data_recipe = {'user': user, 'recipe': obj.id}
-    data_subscribe = {'user': user, 'author': obj.id}
-
-    if model is Recipe:
-        serializer = serializer_in(data=data_recipe)
-    else:
-        serializer = serializer_in(data=data_subscribe)
-
+    data = {'user': user, 'recipe': obj.id} if model is Recipe else {
+        'user': user, 'author': obj.id}
+    serializer = serializer_in(data=data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
-    serializer_to_response = serializer_out(obj, context={'request': request})
-    return serializer_to_response
+    return serializer_out(obj, context={'request': request})
 
 
 def delete_object(request, pk, model_object, model_for_delete_object):
+    """Функция удаления объекта."""
     user = request.user
-
-    obj_recipe = get_object_or_404(model_object, id=pk)
-    obj_subscription = get_object_or_404(model_object, id=pk)
+    obj = get_object_or_404(model_object, id=pk)
 
     if model_for_delete_object is Subscription:
-        object = get_object_or_404(
-            model_for_delete_object, user=user, author=obj_subscription
-        )
+        field = 'author'
     else:
-        object = get_object_or_404(
-            model_for_delete_object, user=user, recipe=obj_recipe
-        )
+        field = 'recipe'
+
+    object = get_object_or_404(
+        model_for_delete_object, user=user,
+        **{field: obj}
+    )
+
     object.delete()
