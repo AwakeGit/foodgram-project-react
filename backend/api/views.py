@@ -1,10 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from django.shortcuts import HttpResponse
-
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -16,7 +14,6 @@ from rest_framework.response import Response
 from recipes.filters import RecipeFilter
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from users.models import Subscription
-
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (
     FavoriteSerializer, IngredientSerializer, RecipeFavoriteSerializer,
