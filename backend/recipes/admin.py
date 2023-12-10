@@ -1,7 +1,6 @@
 from django.contrib import admin
 
 from .forms import NotAllowEmptyForm
-
 from .models import (
     Favorite, Ingredient, IngredientRecipes,
     Recipe, ShoppingCart, Tag
