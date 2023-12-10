@@ -14,6 +14,17 @@ from users.models import Subscription
 User = get_user_model()
 
 
+class BaseSerializer(serializers.ModelSerializer):
+    """Базовый сериализатор."""
+
+    class Meta:
+        abstract = True
+        fields = (
+            'user',
+            'recipe'
+        )
+
+
 class UserSerializer(UserSerializer):
     """Сериализатор пользователя."""
     is_subscribed = SerializerMethodField()
@@ -160,6 +171,48 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             'cooking_time',
         )
 
+    def validate(self, attrs):
+        # Проверяем, что пришли ингредиенты
+        if not attrs['ingredients']:
+            raise serializers.ValidationError('Необходимо указать ингредиенты')
+
+        # Проверяем, что пришли теги
+        if not attrs['tags']:
+            raise serializers.ValidationError('Необходимо указать теги')
+
+        # Проверяем, что вес ингредиентов больше нуля
+        for ingredient in attrs['ingredients']:
+            if ingredient['weight'] <= 0:
+                raise serializers.ValidationError(
+                    f'Вес ингредиента {ingredient["name"]} должен быть больше нуля'
+                )
+
+        # Проверяем, что время готовки больше нуля
+        if attrs['cooking_time'] <= 0:
+            raise serializers.ValidationError(
+                'Время готовки должно быть больше нуля'
+            )
+
+        # Проверяем, что ингредиенты не повторяются
+        ingredients_set = set()
+        for ingredient in attrs['ingredients']:
+            if ingredient['name'] in ingredients_set:
+                raise serializers.ValidationError(
+                    f'Ингредиент {ingredient["name"]} повторяется'
+                )
+            ingredients_set.add(ingredient['name'])
+
+        # Проверяем, что теги не повторяются
+        tags_set = set()
+        for tag in attrs['tags']:
+            if tag.id in tags_set:
+                raise serializers.ValidationError(
+                    f'Тэг {tag.name} повторяется'
+                )
+            tags_set.add(tag.id)
+
+        return attrs
+
     def create_ingredients(self, ingredients, recipe):
         """Создает ингредиенты."""
         ingredient_objs = [
@@ -209,16 +262,12 @@ class RecipeFavoriteSerializer(serializers.ModelSerializer):
         )
 
 
-class FavoriteAndShoppingCartSerializerBase(serializers.ModelSerializer):
+class FavoriteAndShoppingCartSerializerBase(BaseSerializer):
     """Сериализатор для добавления рецептов в избранное и корзину."""
 
-    class Meta:
+    class Meta(BaseSerializer.Meta):
         model = Favorite
-        abstract = True
-        fields = (
-            'user',
-            'recipe'
-        )
+
 
     def validate(self, data):
         """Проверяет наличие рецепта в избранном."""
