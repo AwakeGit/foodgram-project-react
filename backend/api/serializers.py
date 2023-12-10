@@ -138,14 +138,14 @@ class RecipeReadSerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         """Получает queryset с рецептами из избранного."""
         user = self.context.get('request').user
-        return (user.is_authenticated
-                and user.favorites.filter(recipe=obj).exists())
+        return (user.is_authenticated and
+                user.favorites.filter(recipe=obj).exists())
 
     def get_is_in_shopping_cart(self, obj):
         """Получает queryset с рецептами в корзине."""
         user = self.context.get('request').user
-        return (user.is_authenticated
-                and user.cart.filter(recipe=obj).exists())
+        return (user.is_authenticated and
+                user.cart.filter(recipe=obj).exists())
 
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
@@ -184,7 +184,8 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         for ingredient in attrs['ingredients']:
             if ingredient['weight'] <= 0:
                 raise serializers.ValidationError(
-                    f'Вес ингредиента {ingredient["name"]} должен быть больше нуля'
+                    f'Вес ингредиента {ingredient["name"]} '
+                    f'должен быть больше нуля'
                 )
 
         # Проверяем, что время готовки больше нуля
@@ -267,7 +268,6 @@ class FavoriteAndShoppingCartSerializerBase(BaseSerializer):
 
     class Meta(BaseSerializer.Meta):
         model = Favorite
-
 
     def validate(self, data):
         """Проверяет наличие рецепта в избранном."""
