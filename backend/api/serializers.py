@@ -139,16 +139,15 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         """Получает queryset с рецептами из избранного."""
         user = self.context.get('request').user
         return (
-                user.is_authenticated and
-                user.favorites.filter(recipe=obj).exists()
+            user.is_authenticated
+            and user.favorites.filter(recipe=obj).exists()
         )
 
     def get_is_in_shopping_cart(self, obj):
         """Получает queryset с рецептами в корзине."""
         user = self.context.get('request').user
         return (
-                user.is_authenticated and
-                user.cart.filter(recipe=obj).exists()
+            user.is_authenticated and user.cart.filter(recipe=obj).exists()
         )
 
 
