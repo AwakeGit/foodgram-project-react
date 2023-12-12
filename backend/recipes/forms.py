@@ -4,6 +4,7 @@ from django.forms.models import BaseInlineFormSet
 
 class NotAllowEmptyForm(BaseInlineFormSet):
     """Форма для удаления ингредиентов или тегов из рецепта."""
+    min_num = 1  # Минимальное количество форм
 
     def clean(self):
         """Проверка на наличие ингредиентов или тегов."""
