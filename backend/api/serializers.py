@@ -174,7 +174,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             'cooking_time',
         )
 
-
     def validate(self, data):
         # Проверяем, что пришли ингредиенты
         if not data['ingredients']:
@@ -288,14 +287,12 @@ class RecipeFavoriteSerializer(serializers.ModelSerializer):
 class FavoriteAndShoppingCartSerializerBase(BaseSerializer):
     """Сериализатор для добавления рецептов в избранное и корзину."""
 
-
     class Meta():
         model = Favorite
         fields = (
             'user',
             'recipe'
         )
-
 
     def validate(self, data):
         """Проверяет наличие рецепта в избранном."""
