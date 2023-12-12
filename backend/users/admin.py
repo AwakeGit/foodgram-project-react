@@ -7,6 +7,7 @@ from .models import Subscription, User
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
+    """Кастомная модель админки."""
     list_display = (
         'id', 'username', 'email', 'first_name', 'last_name', 'is_staff',)
     list_filter = ('is_staff', 'is_superuser', 'groups')
@@ -23,4 +24,5 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
+    """Класс подписки."""
     list_display = ('user', 'author')
