@@ -14,6 +14,17 @@ from users.models import Subscription
 User = get_user_model()
 
 
+class BaseSerializer(serializers.ModelSerializer):
+    """Базовый сериализатор."""
+
+    class Meta:
+        abstract = True
+        fields = (
+            'user',
+            'recipe'
+        )
+
+
 class UserSerializer(UserSerializer):
     """Сериализатор пользователя."""
     is_subscribed = SerializerMethodField()
@@ -163,6 +174,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             'cooking_time',
         )
 
+
     def validate(self, data):
         # Проверяем, что пришли ингредиенты
         if not data['ingredients']:
@@ -190,10 +202,12 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         if data['cooking_time'] <= 0:
             raise serializers.ValidationError(
                 {'cooking_time': 'Время готовки должно быть больше нуля'}
+
             )
 
         # Проверяем, что ингредиенты не повторяются
         ingredients_set = set()
+
         for ingredient in data['ingredients']:
             ingredient_id = ingredient['id']
             if ingredient_id in ingredients_set:
@@ -271,8 +285,9 @@ class RecipeFavoriteSerializer(serializers.ModelSerializer):
         )
 
 
-class FavoriteAndShoppingCartSerializerBase(serializers.ModelSerializer):
+class FavoriteAndShoppingCartSerializerBase(BaseSerializer):
     """Сериализатор для добавления рецептов в избранное и корзину."""
+
 
     class Meta():
         model = Favorite
@@ -280,6 +295,7 @@ class FavoriteAndShoppingCartSerializerBase(serializers.ModelSerializer):
             'user',
             'recipe'
         )
+
 
     def validate(self, data):
         """Проверяет наличие рецепта в избранном."""
