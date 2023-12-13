@@ -175,61 +175,55 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, data):
-        # Проверяем, что пришли ингредиенты
-        if not data['ingredients']:
-            raise serializers.ValidationError(
-                {'ingredients': 'Необходимо указать ингредиенты'}
-            )
+        self.validate_ingredients_presence(data)
+        self.validate_tags_presence(data)
+        self.validate_ingredient_weights(data)
+        self.validate_unique_tags(data)
 
-        # Проверяем, что пришли теги
-        if not data['tags']:
-            raise serializers.ValidationError(
-                {'tags': 'Необходимо указать теги'}
-            )
-
-        # Проверяем, что вес ингредиентов больше нуля
-        for ingredient in data['ingredients']:
-            if ingredient['amount'] <= 0:
-                raise serializers.ValidationError({
-                    'ingredients': {
-                        f'{ingredient["name"]}': 'Вес ингредиента должен '
-                        'быть больше нуля'
-                    }
-                })
-
-        # Проверяем, что время готовки больше нуля
         if data['cooking_time'] <= 0:
             raise serializers.ValidationError(
                 {'cooking_time': 'Время готовки должно быть больше нуля'}
 
             )
 
-        # Проверяем, что ингредиенты не повторяются
-        ingredients_set = set()
-
-        for ingredient in data['ingredients']:
-            ingredient_id = ingredient['id']
-            if ingredient_id in ingredients_set:
-                raise serializers.ValidationError({
-                    'ingredients': {
-                        f'{ingredient["name"]}': 'Ингредиент повторяется'
-                    }
-                })
-            ingredients_set.add(ingredient_id)
-
-        # Проверяем, что теги не повторяются
-        tags_set = set()
-        for tag in data['tags']:
-            tag_id = tag.id
-            if tag_id in tags_set:
-                raise serializers.ValidationError({
-                    'tags': {
-                        f'{tag.name}': 'Тэг повторяется'
-                    }
-                })
-            tags_set.add(tag_id)
+        ingredients = data['ingredients']
+        ingredients_list = []
+        for ingredient in ingredients:
+            if ingredient['id'] in ingredients_list:
+                raise serializers.ValidationError(
+                    'Ингредиенты должны быть уникальными'
+                )
+            ingredients_list.append(ingredient['id'])
 
         return data
+
+    def validate_ingredients_presence(self, data):
+        """Проверяет наличие ингредиентов."""
+        ingredients = data.get('ingredients', [])
+        if not ingredients:
+            raise serializers.ValidationError(
+                'Необходимо добавить хотя бы один ингредиент')
+
+    def validate_tags_presence(self, data):
+        """Проверяет наличие тегов."""
+        tags = data.get('tags', [])
+        if not tags:
+            raise serializers.ValidationError(
+                'Необходимо добавить хотя бы один тег')
+
+    def validate_ingredient_weights(self, data):
+        """Проверяет вес ингредиента."""
+        ingredients = data.get('ingredients', [])
+        for ingredient in ingredients:
+            if ingredient['amount'] <= 0:
+                raise serializers.ValidationError(
+                    'Вес ингредиента должен быть больше нуля')
+
+    def validate_unique_tags(self, data):
+        """Проверяет уникальность тегов."""
+        tags = data.get('tags', [])
+        if len(tags) != len(set(tags)):
+            raise serializers.ValidationError('Теги должны быть уникальными')
 
     def create_ingredients(self, ingredients, recipe):
         """Создаёт ингредиенты."""

@@ -9,8 +9,12 @@ from .models import (
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
-    """Любимые рецепты."""
-    list_display = ('user', 'recipe')
+    list_display = ('user', 'recipe', 'subscribers_count')
+
+    def subscribers_count(self, obj):
+        return obj.recipe.favorites.count()
+
+    subscribers_count.short_description = 'Количество подписчиков'
 
 
 @admin.register(Ingredient)

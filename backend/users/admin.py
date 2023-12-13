@@ -9,7 +9,7 @@ from .models import Subscription, User
 class CustomUserAdmin(UserAdmin):
     """Кастомная модель админки."""
     list_display = (
-        'id', 'username', 'email', 'first_name', 'last_name', 'is_staff',)
+        'id', 'username', 'email', 'subscription_count',)
     list_filter = ('is_staff', 'is_superuser', 'groups')
     search_fields = ('username', 'email', 'first_name', 'last_name')
     fieldsets = (
