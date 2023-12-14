@@ -98,6 +98,11 @@ class Recipe(models.Model):
         auto_now_add=True
     )
 
+    def faivorites_count(self):
+        return self.favorites.count()
+
+    faivorites_count.short_description = 'Количество добавлений в избранное'
+
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
@@ -159,6 +164,9 @@ class Favorite(models.Model):
         related_name='favorites',
         verbose_name='Рецепт'
     )
+
+    # def users_count(self):
+    #     return self.recipe.favorites.count()
 
     class Meta:
         verbose_name = 'Избранный рецепт'

@@ -31,6 +31,8 @@ class User(AbstractUser):
     def subscription_count(self):
         return self.subscribing.count()
 
+    subscription_count.short_description = 'Количество подписок на автора'
+
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'

@@ -9,12 +9,8 @@ from .models import (
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
-    list_display = ('user', 'recipe', 'subscribers_count')
-
-    def subscribers_count(self, obj):
-        return obj.recipe.favorites.count()
-
-    subscribers_count.short_description = 'Количество подписчиков'
+    list_display = ('user', 'recipe')
+    # list_display = ('user_count')
 
 
 @admin.register(Ingredient)
@@ -44,7 +40,7 @@ class TagInline(InlineBase):
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     """Рецепты."""
-    list_display = ('id', 'name', 'author', 'pub_date')
+    list_display = ('id', 'name', 'author', 'pub_date', 'faivorites_count')
     list_filter = ('author', 'name', 'tags')
     exclude = ('tags',)
     inlines = [IngredientRecipeInline, TagInline]
